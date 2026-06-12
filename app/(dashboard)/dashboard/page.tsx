@@ -12,6 +12,21 @@ import StorageUsage from "@/components/StorageUsage";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import { IFile } from "@/models/File";
 import { IFolder } from "@/models/Folder";
+import { 
+  Cloud, 
+  Search, 
+  Grid3X3, 
+  List, 
+  FolderPlus, 
+  Upload,
+  Files,
+  Share2,
+  Clock,
+  Trash2,
+  ChevronRight,
+  User,
+  LogOut
+} from "lucide-react";
 
 type ViewMode = "grid" | "list";
 
@@ -34,7 +49,7 @@ export default function DashboardPage() {
   // Folder navigation state
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([
-    { id: null, name: "My Drive" },
+    { id: null, name: "My Files" },
   ]);
 
   // Modals
@@ -152,104 +167,147 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="text-gray-600">Loading your files...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
-      {/* Navbar */}
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-2xl">☁️</span>
-          <span className="font-bold text-lg text-gray-800 dark:text-gray-100">CloudDrive</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:block">
-            Hello,{" "}
-            <span className="font-medium text-gray-700 dark:text-gray-200">{user?.name}</span>
-          </span>
-          <DarkModeToggle />
-          <button
-            onClick={logout}
-            className="text-sm px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors dark:text-gray-300"
-          >
-            Logout
-          </button>
+    <div className="min-h-screen bg-gray-50">
+      {/* Top Navbar */}
+      <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Cloud className="w-8 h-8 text-blue-600" />
+            <h1 className="text-xl font-bold text-gray-900">CloudDrive</h1>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <DarkModeToggle />
+            <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
+              <User className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium text-gray-900">Hello, {user?.name}</span>
+            </div>
+            <button
+              onClick={logout}
+              className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors font-medium"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
       </header>
 
-      <div className="flex max-w-6xl mx-auto px-6 py-8 gap-6">
+      <div className="flex">
         {/* Sidebar */}
-        <aside className="hidden lg:flex flex-col w-52 shrink-0">
-          <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Storage
-              </p>
-            </div>
+        <aside className="w-64 bg-gray-100 border-r border-gray-200 min-h-[calc(100vh-73px)] p-6 hidden lg:block">
+          <nav className="space-y-2 mb-8">
+            <a 
+              href="#" 
+              className="flex items-center gap-3 px-3 py-2 text-blue-600 bg-blue-50 rounded-lg font-medium"
+            >
+              <Files className="w-5 h-5" />
+              My Files
+            </a>
+            <a 
+              href="#" 
+              className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-colors"
+            >
+              <Share2 className="w-5 h-5" />
+              Shared
+            </a>
+            <a 
+              href="#" 
+              className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-colors"
+            >
+              <Clock className="w-5 h-5" />
+              Recent
+            </a>
+            <a 
+              href="#" 
+              className="flex items-center gap-3 px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-colors"
+            >
+              <Trash2 className="w-5 h-5" />
+              Trash
+            </a>
+          </nav>
+
+          <div className="bg-white rounded-lg p-4 shadow-sm">
+            <h3 className="text-sm font-medium text-gray-900 mb-3">Storage</h3>
             <StorageUsage />
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0">
-        {/* Breadcrumbs */}
-        <nav className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 mb-4 flex-wrap">
-          {breadcrumbs.map((crumb, i) => (
-            <span key={i} className="flex items-center gap-1">
-              {i > 0 && <span className="text-gray-300 dark:text-gray-600">/</span>}
-              <button
-                onClick={() => navigateTo(crumb, i)}
-                className={`hover:text-blue-600 transition-colors ${
-                  i === breadcrumbs.length - 1
-                    ? "text-gray-800 dark:text-gray-100 font-medium pointer-events-none"
-                    : "hover:underline"
-                }`}
-              >
-                {crumb.name}
-              </button>
-            </span>
-          ))}
-        </nav>
+        {/* Main Content */}
+        <main className="flex-1 p-6">
+          {/* Breadcrumbs */}
+          <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+            {breadcrumbs.map((crumb, i) => (
+              <div key={i} className="flex items-center gap-2">
+                {i > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
+                <button
+                  onClick={() => navigateTo(crumb, i)}
+                  className={`hover:text-blue-600 transition-colors ${
+                    i === breadcrumbs.length - 1
+                      ? "text-gray-900 font-medium pointer-events-none"
+                      : "hover:underline"
+                  }`}
+                >
+                  {crumb.name}
+                </button>
+              </div>
+            ))}
+          </nav>
 
         {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">
             {breadcrumbs[breadcrumbs.length - 1].name}
           </h1>
           <div className="flex items-center gap-3 flex-wrap">
-            <input
-              type="text"
-              placeholder="Search..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="text-sm px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-300 w-44"
-            />
-            <div className="flex rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search files..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-64"
+              />
+            </div>
+            <div className="flex border border-gray-300 rounded-lg overflow-hidden">
               <button
                 onClick={() => setView("grid")}
-                className={`px-3 py-2 text-sm transition-colors ${
+                className={`p-2 ${
                   view === "grid"
                     ? "bg-blue-600 text-white"
-                    : "bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    : "bg-white text-gray-600 hover:bg-gray-50"
                 }`}
-              >⊞</button>
+              >
+                <Grid3X3 className="w-4 h-4" />
+              </button>
               <button
                 onClick={() => setView("list")}
-                className={`px-3 py-2 text-sm transition-colors ${
+                className={`p-2 ${
                   view === "list"
                     ? "bg-blue-600 text-white"
-                    : "bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
+                    : "bg-white text-gray-600 hover:bg-gray-50"
                 }`}
-              >☰</button>
+              >
+                <List className="w-4 h-4" />
+              </button>
             </div>
             <button
               onClick={() => setShowCreateFolder(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
             >
-              📁 New Folder
+              <FolderPlus className="w-4 h-4" />
+              New Folder
             </button>
             <UploadButton folderId={currentFolderId} onUploaded={fetchContents} />
           </div>
@@ -257,7 +315,7 @@ export default function DashboardPage() {
 
         {/* Error */}
         {error && (
-          <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 text-sm flex items-center justify-between">
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm flex items-center justify-between">
             <span>{error}</span>
             <button onClick={fetchContents} className="underline text-xs">Retry</button>
           </div>
@@ -268,7 +326,7 @@ export default function DashboardPage() {
           <div
             className={`grid gap-4 ${
               view === "grid"
-                ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+                ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
                 : "grid-cols-1"
             }`}
           >
@@ -283,32 +341,39 @@ export default function DashboardPage() {
 
         {/* Empty state */}
         {isEmpty && (
-          <div className="flex flex-col items-center justify-center py-24 text-gray-400">
-            <span className="text-6xl mb-4">📂</span>
-            <p className="text-lg font-medium">
-              {search ? "No results found" : "This folder is empty"}
-            </p>
-            <p className="text-sm mt-1">
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <Upload className="w-12 h-12 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              {search ? "No files found" : "No files yet"}
+            </h3>
+            <p className="text-gray-500 text-center max-w-sm">
               {search
-                ? "Try a different keyword"
-                : "Create a folder or upload files to get started"}
+                ? "Try adjusting your search terms"
+                : "Upload your first file to get started with CloudDrive!"}
             </p>
+            {!search && (
+              <div className="mt-6">
+                <UploadButton folderId={currentFolderId} onUploaded={fetchContents} />
+              </div>
+            )}
           </div>
         )}
 
         {/* Contents */}
         {!fetching && (filteredFolders.length > 0 || filteredFiles.length > 0) && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             {/* Folders section */}
             {filteredFolders.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                  Folders
+                <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
+                  Folders ({filteredFolders.length})
                 </p>
                 <div
                   className={`grid gap-4 ${
                     view === "grid"
-                      ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+                      ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
                       : "grid-cols-1"
                   }`}
                 >
@@ -329,13 +394,13 @@ export default function DashboardPage() {
             {/* Files section */}
             {filteredFiles.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                  Files
+                <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
+                  Files ({filteredFiles.length})
                 </p>
                 <div
                   className={`grid gap-4 ${
                     view === "grid"
-                      ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
+                      ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
                       : "grid-cols-1"
                   }`}
                 >
@@ -353,13 +418,6 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Count */}
-        {!fetching && (files.length > 0 || folders.length > 0) && (
-          <p className="text-xs text-gray-400 mt-6 text-right">
-            {filteredFolders.length} folder{filteredFolders.length !== 1 ? "s" : ""},{" "}
-            {filteredFiles.length} file{filteredFiles.length !== 1 ? "s" : ""}
-          </p>
-        )}
         </main>
       </div>
 

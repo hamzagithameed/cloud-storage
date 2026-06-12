@@ -19,7 +19,13 @@ export async function POST(req: NextRequest) {
       return errorResponse("Database configuration error", 500);
     }
 
-    await connectDB();
+    // Try to connect to database with specific error handling
+    try {
+      await connectDB();
+    } catch (dbErr: any) {
+      console.error("[REGISTER] Database connection failed:", dbErr.message);
+      return errorResponse("Database connection failed. Please try again later.", 500);
+    }
 
     const existing = await User.findOne({ email });
     if (existing) return errorResponse("Email already in use", 409);
@@ -34,17 +40,21 @@ export async function POST(req: NextRequest) {
       201
     );
   } catch (err: any) {
-    console.error("[REGISTER] Full error:", err);
+    console.error("[REGISTER] Registration error:", err);
     
     // Handle specific MongoDB connection errors
     if (err.message?.includes('querySrv ENOTFOUND') || err.message?.includes('ENOTFOUND')) {
-      return errorResponse("Database connection failed - please check MongoDB configuration", 500);
+      return errorResponse("Database connection failed. Please try again later.", 500);
     }
     
     if (err.message?.includes('authentication failed')) {
-      return errorResponse("Database authentication failed - please check credentials", 500);
+      return errorResponse("Database authentication failed. Please try again later.", 500);
+    }
+
+    if (err.message?.includes('timeout')) {
+      return errorResponse("Database connection timeout. Please try again later.", 500);
     }
     
-    return errorResponse("Registration failed - please try again", 500);
+    return errorResponse("Registration failed. Please try again later.", 500);
   }
 }
