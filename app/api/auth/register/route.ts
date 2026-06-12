@@ -13,6 +13,12 @@ export async function POST(req: NextRequest) {
       return errorResponse("All fields are required");
     }
 
+    // Validate MongoDB URI is present
+    if (!process.env.MONGODB_URI) {
+      console.error("[REGISTER] MONGODB_URI environment variable not found");
+      return errorResponse("Database configuration error", 500);
+    }
+
     await connectDB();
 
     const existing = await User.findOne({ email });
@@ -27,8 +33,18 @@ export async function POST(req: NextRequest) {
       { token, user: { id: user._id, name: user.name, email: user.email } },
       201
     );
-  } catch (err) {
-    console.error("[REGISTER]", err);
-    return errorResponse("Internal server error", 500);
+  } catch (err: any) {
+    console.error("[REGISTER] Full error:", err);
+    
+    // Handle specific MongoDB connection errors
+    if (err.message?.includes('querySrv ENOTFOUND') || err.message?.includes('ENOTFOUND')) {
+      return errorResponse("Database connection failed - please check MongoDB configuration", 500);
+    }
+    
+    if (err.message?.includes('authentication failed')) {
+      return errorResponse("Database authentication failed - please check credentials", 500);
+    }
+    
+    return errorResponse("Registration failed - please try again", 500);
   }
 }
