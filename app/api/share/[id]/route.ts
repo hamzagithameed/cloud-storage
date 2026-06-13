@@ -18,7 +18,12 @@ export const POST = withAuth(
       file.isPublic = true;
       await file.save();
 
-      const shareUrl = `${process.env.NEXTAUTH_URL}/shared/${shareToken}`;
+      // Get the correct base URL from the request
+      const host = req.headers.get('host') || req.headers.get('x-forwarded-host');
+      const protocol = req.headers.get('x-forwarded-proto') || 'https';
+      const baseUrl = host ? `${protocol}://${host}` : process.env.NEXTAUTH_URL;
+      
+      const shareUrl = `${baseUrl}/shared/${shareToken}`;
       return successResponse({ shareUrl, shareToken });
     } catch (err) {
       console.error("[SHARE POST]", err);
